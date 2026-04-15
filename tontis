@@ -1,0 +1,487 @@
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+    Name = "GVL Script | Premium Template",
+    LoadingTitle = "GVL Loading...",
+    LoadingSubtitle = "by Antigravity",
+    ConfigurationSaving = {
+        Enabled = true,
+        FolderName = "GVL_Configs",
+        FileName = "GVL_Main"
+    },
+    KeySystem = false
+})
+
+
+
+-- BYPASS 1: Core Anti-Kick (Essential)
+-- Modifies a core script to nullify kick actions. This is fundamental.
+for k, v in pairs(getgc(true)) do
+    if pcall(function()
+        return rawget(v, "indexInstance")
+    end) and type(rawget(v, "indexInstance")) == "table" and (rawget(v, "indexInstance"))[1] == "kick" then
+        setreadonly(v, false)
+        v.tvk = {
+            "kick",
+            function()
+                return game.Workspace:WaitForChild("")
+            end
+        }
+    end
+end
+
+--=============================================================================
+-- SETTINGS
+--=============================================================================
+local GVLSettings = {
+    BallMagnet = false,
+    BallPrediction = false,
+    ReactKiller = false,
+    ReactBooster = false,
+    NoDelayBall = false,
+    ReachEnabled = false,
+    Reach = 10,
+    ReachTransparency = 0.5
+}
+
+--=============================================================================
+-- TABS
+--=============================================================================
+local MainTab = Window:CreateTab("Main Features", 4483362458)
+local ReactTab = Window:CreateTab("Reaction & Speed", 4483362458)
+local VisualTab = Window:CreateTab("Visuals", 4483362458)
+
+--=============================================================================
+-- MAIN FEATURES (Ball & Reach)
+--=============================================================================
+MainTab:CreateSection("Ball Mechanics")
+
+MainTab:CreateToggle({
+    Name = "No Delay Ball",
+    CurrentValue = false,
+    Flag = "NoDelayBall",
+    Callback = function(Value)
+        GVLSettings.NoDelayBall = Value
+    end,
+})
+
+MainTab:CreateSection("Reach Settings")
+
+MainTab:CreateToggle({
+    Name = "Enable Reach",
+    CurrentValue = false,
+    Flag = "ReachEnabled",
+    Callback = function(Value)
+        GVLSettings.ReachEnabled = Value
+    end,
+})
+
+MainTab:CreateSlider({
+    Name = "Reach Distance",
+    Range = {0, 20},
+    Increment = 1,
+    Suffix = " Studs",
+    CurrentValue = 10,
+    Flag = "ReachValue",
+    Callback = function(Value)
+        GVLSettings.Reach = Value
+    end,
+})
+
+MainTab:CreateSlider({
+    Name = "Reach Transparency",
+    Range = {0, 1},
+    Increment = 0.1,
+    Suffix = " Alpha",
+    CurrentValue = 0.5,
+    Flag = "ReachTransparency",
+    Callback = function(Value)
+        GVLSettings.ReachTransparency = Value
+    end,
+})
+
+--=============================================================================
+-- REACTION FEATURES
+--=============================================================================
+ReactTab:CreateSection("Booster")
+ReactTab:CreateToggle({
+    Name = "React Booster",
+    CurrentValue = false,
+    Flag = "ReactBooster",
+    Callback = function(Value)
+        GVLSettings.ReactBooster = Value
+    end,
+})
+
+--=============================================================================
+-- VISUAL FEATURES
+--=============================================================================
+VisualTab:CreateSection("Predictions")
+
+VisualTab:CreateToggle({
+    Name = "Ball Prediction",
+    CurrentValue = false,
+    Flag = "BallPrediction",
+    Callback = function(Value)
+        GVLSettings.BallPrediction = Value
+    end,
+})
+
+VisualTab:CreateParagraph({
+    Title = "Helper Info",
+    Content = "Predictions show the trajectory of the ball. Reach transparency affects how your reach hitbox is visualized if enabled."
+})
+
+VisualTab:CreateSection("Performance")
+
+VisualTab:CreateButton({
+    Name = "Activate FPS Booster",
+    Callback = function()
+        _G.Settings = {
+            Players = {
+                ["Ignore Me"] = true, -- Ignore your Character
+                ["Ignore Others"] = true -- Ignore other Characters
+            },
+            Meshes = {
+                Destroy = false, -- Destroy Meshes
+                LowDetail = true -- Low detail meshes
+            },
+            Images = {
+                Invisible = true, -- Invisible Images
+                LowDetail = false, -- Low detail images
+                Destroy = false, -- Destroy Images
+            },
+            Other = {
+                ["No Particles"] = true, -- Disables all ParticleEmitter, Trail, Smoke, Fire and Sparkles
+                ["No Camera Effects"] = true, -- Disables all PostEffect's (Camera/Lighting Effects)
+                ["No Explosions"] = true, -- Makes Explosion's invisible
+                ["No Clothes"] = true, -- Removes Clothing from the game
+                ["Low Water Graphics"] = true, -- Removes Water Quality
+                ["No Shadows"] = true, -- Remove Shadows
+                ["Low Rendering"] = true, -- Lower Rendering
+                ["Low Quality Parts"] = true -- Lower quality parts
+            }
+        }
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/CasperFlyModz/discord.gg-rips/main/FPSBooster.lua"))()
+        
+        Rayfield:Notify({
+            Title = "FPS Booster Applied",
+            Content = "All unnecessary graphics have been destroyed for maximum performance.",
+            Duration = 4,
+            Image = 4483362458
+        })
+    end,
+})
+
+--=============================================================================
+-- LOGIC TEMPLATE (Example loops)
+--=============================================================================
+task.spawn(function()
+    while task.wait() do
+        -- Logic for Ball Magnet
+        if GVLSettings.BallMagnet then
+            -- Implementation here
+        end
+    end
+end)
+
+--=============================================================================
+-- HBE_REPORT HOOK (Spam Blocker & Spoof)
+--=============================================================================
+local lastHBE = 0
+local oldNamecall
+oldNamecall = hookmetamethod(game, "__namecall", function(self, ...)
+    local method = getnamecallmethod()
+    local args = {...}
+    
+    if not checkcaller() and method == "FireServer" and tostring(self) == "HBE_Report" then
+        -- 1 FPS LAGINI ENGELLEYİCİ SPAM KORUMASI: Sadece 0.45 saniyede bir geçmesine izin ver
+        if tick() - lastHBE < 0.45 then
+            return nil -- Fazla gelen tüm Spam'leri (FPS düşürenleri) sunucuya gitmeden çöpten at
+        end
+        lastHBE = tick()
+        
+        local payload = args[1]
+        if type(payload) == "table" then
+            -- ANTICHEAT BYPASS: Biz bacağımızı 50 yapsak bile sunucu standart boyut (1x) zannedecek!
+            if type(payload["Left Leg"]) == "table" then payload["Left Leg"].Size = Vector3.new(1, 2, 1) end
+            if type(payload["Right Leg"]) == "table" then payload["Right Leg"].Size = Vector3.new(1, 2, 1) end
+            if type(payload["Left Arm"]) == "table" then payload["Left Arm"].Size = Vector3.new(1, 2, 1) end
+            if type(payload["Right Arm"]) == "table" then payload["Right Arm"].Size = Vector3.new(1, 2, 1) end
+            if type(payload["Torso"]) == "table" then payload["Torso"].Size = Vector3.new(2, 2, 1) end
+            if type(payload["Head"]) == "table" then payload["Head"].Size = Vector3.new(2, 1, 1) end
+            if type(payload["HumanoidRootPart"]) == "table" then payload["HumanoidRootPart"].Size = Vector3.new(2, 2, 1) end
+            
+            return oldNamecall(self, payload)
+        end
+    end
+    
+    return oldNamecall(self, ...)
+end)
+
+--=============================================================================
+-- FİZİKSEL REACH ALGORİTMASI (Görünür Box Reach Seçeneği)
+--=============================================================================
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+local ZeroPhysics = PhysicalProperties.new(0, 0, 0, 0, 0)
+
+RunService.RenderStepped:Connect(function()
+    local char = LocalPlayer.Character
+    if not char then return end
+    
+    local root = char:FindFirstChild("HumanoidRootPart")
+    local realLeftLeg = char:FindFirstChild("Left Leg")
+    if not root or not realLeftLeg then return end
+    
+    local reachBox = char:FindFirstChild("GVL_BoxReach")
+    
+    if GVLSettings.ReachEnabled then
+        local currentReach = math.max(1, GVLSettings.Reach)
+        
+        -- TEK BİR DEV KUTU (BOX REACH)
+        if not reachBox then
+            reachBox = Instance.new("Part")
+            reachBox.Name = "GVL_BoxReach"
+            
+            -- Bahsettiğin güzel Mavi Görünüm (O mavi leg)
+            reachBox.Material = Enum.Material.ForceField
+            reachBox.Color = Color3.fromRGB(0, 150, 255)
+            
+            reachBox.CanCollide = false
+            reachBox.Massless = true
+            reachBox.CustomPhysicalProperties = ZeroPhysics
+            
+            -- Kutuyu merkeze (bacak hizasına) hizala
+            reachBox.CFrame = root.CFrame * CFrame.new(0, -1, 0)
+            
+            local weld = Instance.new("WeldConstraint")
+            weld.Part0 = root
+            weld.Part1 = reachBox
+            weld.Parent = reachBox
+            reachBox.Parent = char
+        end
+        
+        -- Kutu Boyutunu Ayarla (Örn: 9, 9, 9)
+        local targetSize = Vector3.new(currentReach, currentReach, currentReach)
+        if reachBox.Size ~= targetSize then
+            reachBox.Size = targetSize
+        end
+        reachBox.Transparency = GVLSettings.ReachTransparency
+        
+    else
+        -- Kapatıldığında yok et
+        if reachBox then reachBox:Destroy() end
+    end
+end)
+
+--=============================================================================
+-- REACT & NO DELAY ALGORİTMASI (Sensör / Anti-Ping / İnsansı Matematik)
+--=============================================================================
+RunService.RenderStepped:Connect(function()
+    if not GVLSettings.ReactBooster and not GVLSettings.NoDelayBall then return end
+    
+    local char = LocalPlayer.Character
+    if not char then return end
+    local root = char:FindFirstChild("HumanoidRootPart")
+    local realLeftLeg = char:FindFirstChild("Left Leg")
+    if not root or not realLeftLeg then return end
+    
+    local unlockedFolder = workspace:FindFirstChild("Unlocked") or workspace:FindFirstChild("Balls") or workspace
+    if not unlockedFolder then return end
+    
+    local closestBall = nil
+    local minDistance = math.huge
+    local rootPos = root.Position
+    
+    -- Klasördeki tüm "Ball" lar arasında en yakın olanı bul
+    for _, item in pairs(unlockedFolder:GetChildren()) do
+        if string.lower(item.Name) == "ball" and item:IsA("BasePart") then
+            local dist = (item.Position - rootPos).Magnitude
+            if dist < minDistance then
+                minDistance = dist
+                closestBall = item
+            end
+        end
+    end
+    
+    if closestBall then
+        local targetHitbox = char:FindFirstChild("GVL_BoxReach") or realLeftLeg
+        local relPos = targetHitbox.CFrame:ToObjectSpace(closestBall.CFrame).Position
+        local size = targetHitbox.Size
+        
+        local triggeredHit = false
+        
+        --=========================================================================
+        -- 1. NO DELAY BALL (Sıfır Gecikme / Predictive Aura Sistemi)
+        -- Top kutuya fiziksel girmeden (1-2 stud dışından) "0 pingmiş gibi" vurur.
+        --=========================================================================
+        if GVLSettings.NoDelayBall then
+            local auraExpansion = 2.5 -- Kutunun 2.5 stud dışına sanal bir menzil kurar
+            local expandedSize = size + Vector3.new(auraExpansion, auraExpansion, auraExpansion)
+            
+            -- Top genişletilmiş bu görünmez zırhın (Aura) sınırlarına girdiyse
+            local inAura = (math.abs(relPos.X) <= expandedSize.X/2) and (math.abs(relPos.Y) <= expandedSize.Y/2) and (math.abs(relPos.Z) <= expandedSize.Z/2)
+            
+            if inAura then
+                -- İnsansılık (Legit Check Katmanı): Çift-vuruş (Double Hit) hatasını engellemek ve bot gibi davranmamak için:
+                -- Top saniyede 5 studdan daha hızlıysa ve BİZE DOĞRU (Yaklaşıyor) geliyorsa No-Delay tetikle.
+                -- Eğer biz az önce vurduysak ve top bizden UZAKLAŞIYORSA, o zaman dibimizde olsa bile yeniden vurma.
+                local ballVel = closestBall.AssemblyLinearVelocity
+                local dirToPlayer = (rootPos - closestBall.Position).Unit
+                
+                if ballVel.Magnitude > 5 then
+                    -- Nokta Çarpım (Dot Product) > 0 ise topun burnu oyuncu ile aynı yöndedir.
+                    local approachRate = ballVel.Unit:Dot(dirToPlayer)
+                    if approachRate > 0.1 then 
+                        triggeredHit = true -- Bize doğru şiddetle geliyor, gecikmesiz affetme VUR!
+                    end
+                else
+                    -- Top yavaşsa (veya havada duruyorsa) yönüne bakmaksızın hemen al
+                    triggeredHit = true
+                end
+            end
+        end
+        
+        --=========================================================================
+        -- 2. REACT BOOSTER (Matematiksel Kutu İçi Sensör)
+        -- Normal şartlarda, top tam kutunun içine girdiği ilk milisaniye vurur.
+        --=========================================================================
+        if GVLSettings.ReactBooster and not triggeredHit then
+            local isInside = (math.abs(relPos.X) <= size.X/2) and (math.abs(relPos.Y) <= size.Y/2) and (math.abs(relPos.Z) <= size.Z/2)
+            if isInside then
+                triggeredHit = true
+            end
+        end
+        
+        -- VURUŞ MOTORU: Şartlar sağlandıysa engelleri aşıp sinyali gönder
+        if triggeredHit and firetouchinterest then
+            firetouchinterest(realLeftLeg, closestBall, 0)
+            firetouchinterest(realLeftLeg, closestBall, 1)
+        end
+    end
+end)
+
+--=============================================================================
+-- ANTIGRAVITY ARC PREDICTOR (Nokta Atışı & Kavisli Fiziksel Tahmin)
+--=============================================================================
+local DumpPrediction = {}
+
+local function clearPredictions()
+    for _, obj in pairs(DumpPrediction) do
+        if obj and obj.Parent then obj:Destroy() end
+    end
+    table.clear(DumpPrediction)
+end
+
+-- Topun bir kavis boyunca saniye saniye nerede olacağını gerçekçi hesaplayan motor.
+local function getTrajectoryPoints(startPos, startVel, gravity, timeStep, maxTime)
+    local points = {startPos}
+    local currentPos = startPos
+    local currentVel = startVel
+    
+    local params = RaycastParams.new()
+    params.FilterType = Enum.RaycastFilterType.Exclude
+    params.FilterDescendantsInstances = {LocalPlayer.Character, workspace:FindFirstChild("Balls"), workspace:FindFirstChild("Unlocked")}
+    
+    for t = timeStep, maxTime, timeStep do
+        local nextVel = currentVel - Vector3.new(0, gravity * timeStep, 0)
+        local nextPos = currentPos + (currentVel * timeStep)
+        
+        -- Yere (veya duvara) çarpma kontrolü
+        local ray = workspace:Raycast(currentPos, nextPos - currentPos, params)
+        if ray then
+            table.insert(points, ray.Position)
+            break
+        end
+        
+        table.insert(points, nextPos)
+        currentPos = nextPos
+        currentVel = nextVel
+    end
+    
+    return points
+end
+
+RunService.RenderStepped:Connect(function()
+    if not GVLSettings.BallPrediction then
+        clearPredictions()
+        return
+    end
+
+    local char = LocalPlayer.Character
+    if not char then return end
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if not root then return end
+    
+    local folder = workspace:FindFirstChild("Unlocked") or workspace:FindFirstChild("Balls") or workspace
+    local closestBall = nil
+    local minDistance = math.huge
+    
+    for _, item in pairs(folder:GetChildren()) do
+        if item:IsA("BasePart") and string.match(string.lower(item.Name), "ball") then
+            -- Sadece fırlatılmış / hareket halinde olan topları hedef alır
+            if item.AssemblyLinearVelocity.Magnitude > 2 then
+                local dist = (item.Position - root.Position).Magnitude
+                if dist < minDistance then
+                    minDistance = dist
+                    closestBall = item
+                end
+            end
+        end
+    end
+    
+    clearPredictions()
+    if closestBall then
+        -- Kavis çözünürlüğü: 0.1 saniye adımlarla, toplam 3 saniyelik uçuşu tahmin et
+        local trajectory = getTrajectoryPoints(closestBall.Position, closestBall.AssemblyLinearVelocity, workspace.Gravity, 0.05, 4)
+        
+        if #trajectory > 1 then
+            for i = 1, #trajectory - 1 do
+                local p1 = trajectory[i]
+                local p2 = trajectory[i+1]
+                local dist = (p1 - p2).Magnitude
+                
+                -- Kavis üzerindeki her noktaya şık bir çizgi çizer
+                local line = Instance.new("Part")
+                line.Anchored = true
+                line.CanCollide = false
+                line.Massless = true
+                line.Material = Enum.Material.Neon
+                line.Color = Color3.fromRGB(255, 0, 50)
+                line.Size = Vector3.new(0.2, 0.2, dist)
+                line.CFrame = CFrame.lookAt(p1, p2) * CFrame.new(0, 0, -dist/2)
+                line.Parent = workspace.Terrain
+                
+                table.insert(DumpPrediction, line)
+            end
+            
+            -- Düştüğü TAM NOKTAYA hedef halkası (İnme noktası belirteci)
+            local dropMark = Instance.new("Part")
+            dropMark.Anchored = true
+            dropMark.CanCollide = false
+            dropMark.Size = Vector3.new(3, 0.1, 3)
+            dropMark.CFrame = CFrame.new(trajectory[#trajectory])
+            dropMark.Shape = Enum.PartType.Cylinder
+            dropMark.Material = Enum.Material.Neon
+            dropMark.Color = Color3.fromRGB(0, 255, 100) -- Düştüğü yer yeşil yanar
+            dropMark.Parent = workspace.Terrain
+            
+            table.insert(DumpPrediction, dropMark)
+        end
+    end
+end)
+
+Rayfield:Notify({
+    Title = "GVL Script Loaded",
+    Content = "Template is ready. Customize the logic inside GVL.lua",
+    Duration = 5,
+    Image = 4483362458,
+    Actions = {
+        Ignore = {
+            Name = "Okay!",
+            Callback = function() end
+        },
+    },
+})
